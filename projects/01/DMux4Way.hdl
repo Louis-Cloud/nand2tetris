@@ -16,13 +16,14 @@ CHIP DMux4Way {
     OUT a, b, c, d;
 
     PARTS:
-    // Creating not for each sel element
+    // Creating not sel
     Not(in=sel[1], out=notSel1);
 
-    // Creating sel for each letter
+    // Performing DMux on each pair
     DMux(in=in, sel=sel[0], a=aOut, b=bOut);
     DMux(in=in, sel=sel[0], a=cOut, b=dOut);
 
+    // Anding it with the current sel for output
     And(a=aOut, b=notSel1, out=a);
     And(a=bOut, b=notSel1, out=b);
     And(a=cOut, b=sel[1], out=c);
