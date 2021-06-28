@@ -42,5 +42,68 @@ CHIP ALU {
         ng; // 1 if (out < 0),  0 otherwise
 
     PARTS:
-   // Put you code here:
+        // Zero x input if needed
+        Not(in=zx, out=zxNot);
+        And16(a=x,  b[0]=zxNot, 
+                    b[1]=zxNot, 
+                    b[2]=zxNot,
+                    b[3]=zxNot,
+                    b[4]=zxNot,
+                    b[5]=zxNot,
+                    b[6]=zxNot,
+                    b[7]=zxNot,
+                    b[8]=zxNot,
+                    b[9]=zxNot,
+                    b[10]=zxNot,
+                    b[11]=zxNot,
+                    b[12]=zxNot,
+                    b[13]=zxNot,
+                    b[14]=zxNot,
+                    b[15]=zxNot,
+                    out=zeroX);
+        // Negate x input if needed
+        Not16(in=zeroX, out=notZeroX);
+        Mux16(a=zeroX, b=notZeroX, sel=nx, out=correctedX);
+
+        // Zero y input if needed
+        Not(in=zy, out=zyNot);
+        And16(a=y,  b[0]=zyNot,
+                    b[1]=zyNot,
+                    b[2]=zyNot,
+                    b[3]=zyNot,
+                    b[4]=zyNot,
+                    b[5]=zyNot,
+                    b[6]=zyNot,
+                    b[7]=zyNot,
+                    b[8]=zyNot,
+                    b[9]=zyNot,
+                    b[10]=zyNot,
+                    b[11]=zyNot,
+                    b[12]=zyNot,
+                    b[13]=zyNot,
+                    b[14]=zyNot,
+                    b[15]=zyNot,
+                    out=zeroY);
+        // Negate y input if needed
+        Not16(in=zeroY, out=notZeroY);
+        Mux16(a=zeroY, b=notZeroY, sel=ny, out=correctedY);
+
+        // And or Plus x and y 
+        And16(a=correctedX, b=correctedY, out=xAndy);
+        Add16(a=correctedX, b=correctedY, out=xPlusy);
+        Mux16(a=xAndy, b=xPlusy, sel=f, out=xy);
+
+        // Negate answer if needed
+        Not16(in=xy, out=notxy);
+        Mux16(a=xy, b=notxy, sel=no, out=outA);
+
+        // Calculate zr
+        Not16(in=outA, out=notOut, out[15]=backCheck);
+        Inc16(in=notOut, out[15]=notFrontCheck);
+        Not(in=notFrontCheck, out=frontCheck);
+        And(a=frontCheck, b=backCheck, out=zr);
+
+        And16(a=outA, b=true, out[15]=ng);
+        // Output
+        Or16(a=outA, b=false, out=out);
 }
