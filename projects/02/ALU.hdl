@@ -95,15 +95,10 @@ CHIP ALU {
 
         // Negate answer if needed
         Not16(in=xy, out=notxy);
-        Mux16(a=xy, b=notxy, sel=no, out=outA);
+        Mux16(a=xy, b=notxy, sel=no, out=outA, out=out, out[15]=ng);
 
         // Calculate zr
         Not16(in=outA, out=notOut, out[15]=backCheck);
-        Inc16(in=notOut, out[15]=notFrontCheck);
-        Not(in=notFrontCheck, out=frontCheck);
-        And(a=frontCheck, b=backCheck, out=zr);
-
-        And16(a=outA, b=true, out[15]=ng);
-        // Output
-        Or16(a=outA, b=false, out=out);
+        Inc16(in=notOut, out[15]=frontCheck);
+        Xor(a=frontCheck, b=backCheck, out=zr);
 }
